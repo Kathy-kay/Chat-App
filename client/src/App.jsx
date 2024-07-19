@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 function App() {
   
   return (
-   <Button>Click Me!</Button>
+   <Button>Click me</Button>
   )
 }
 
