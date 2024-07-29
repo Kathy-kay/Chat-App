@@ -10,10 +10,14 @@ dotenv.config()
 connectDb()
 const port = process.env.PORT || 8000
 const app = express()
+
+app.use(cors({
+  origin: [process.env.ORIGIN],
+  methods: ["GET","POST","PUT","PATCH","DELETE"],
+  credentials: true
+})) //enable cors
 app.use(express.json()) //bodyparser
 app.use(cookieParser())
-app.use(cors()) //enable cors
-
 
 app.use("/api/users", router)
 

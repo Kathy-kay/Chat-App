@@ -2,9 +2,13 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    firstName: {
       type: String,
-      required: [true, "Please enter your full name"]
+      required: false
+    },
+    lastName: {
+      type: String,
+      required: false
     },
     email: {
       type: String,
@@ -20,18 +24,28 @@ const userSchema = new mongoose.Schema(
       default: "active"
 
     },
+    image: {
+      type:String,
+      required:false
+    },
+    color: {
+      type: Number,
+      required: false
+    },
+    profileSetup:{
+      type:Boolean,
+      default: false
+    },     
     isVerified: {
       type: Boolean,
       default: false
     },
-    verificationTokenExpires: {
-      type: Date
+    otp: {
+      type: String,
     },
-    verificationToken: {
-      type: Boolean,
-      default: false
+    otpExpires: {
+      type: Date
     }
-
   },
   {
     timestamps: true
