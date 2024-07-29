@@ -13,21 +13,21 @@ const signup = async (req, res) => {
   
   //validate email and password
   if(!email || !password || !confirmPassword){
-    res.status(400).json({message: "All fields are required"})
+    return res.status(400).json({message: "All fields are required"})
   }
 
   if(password !== confirmPassword){
-    res.status(400).json({message: "Password and confirm Password do not match"})
+    return res.status(400).json({message: "Password and confirm Password do not match"})
   }
   //check if email already exist
   const userExist = await User.findOne({email})
   if(userExist){
-    res.status(400).json({message: "User with given emial already exist"})
+    return res.status(400).json({message: "User with given emial already exist"})
   }
 
   //hash password
   const saltRounds = process.env.SALT_ROUNDS
-  const hashedPassword = bcrypt.hash(password, saltRounds)
+  const hashedPassword = await bcrypt.hash(password, saltRounds)
 
   //create ne user
   const newUser = await User.create({
@@ -37,11 +37,11 @@ const signup = async (req, res) => {
     verificationTokenExpires,
     isVerified: false
   })
-  res.status(201).json({message: "User created successfully"})
-
+  return res.status(201).json({message: "User created successfully"})
+  
   } catch (error) {
     console.log(error)
-    res.status(500).json({message: "Internal server error"})
+    return res.status(500).json({message: "Internal server error"})
   }
 }
 
@@ -52,7 +52,7 @@ export const login = async(req, res) =>{
 
   //validate the fields
   if(!email || !password){
-    res.status(400).json({message: "All fields are required"})
+    return res.status(400).json({message: "All fields are required"})
   }
 
   //find the user with email
@@ -93,12 +93,12 @@ export const emailVerify = async(req, res) =>{
 
     //check if the field is filled
     if(!email){
-      res.status(400).json({message: "Email is required"})
+      return res.status(400).json({message: "Email is required"})
     }
     //check if email exist
     const user = await User.findOne({email})
     if(!user){
-      res.status(400).json({message: "No user found with the provided email"})
+      return res.status(400).json({message: "No user found with the provided email"})
     } 
 
     //generate token
@@ -115,7 +115,7 @@ export const emailVerify = async(req, res) =>{
 
     //send verification email
     await emailVerification(email, otp)
-    res.status(200).json({message: "OTP sent to email"})
+   res.status(200).json({message: "OTP sent to email"})
   } catch (error) {
     console.log(error )
     res.status(500).json({message: "Internal server error"})
@@ -124,5 +124,70 @@ export const emailVerify = async(req, res) =>{
 
 
 //otp verification
+export const otpVerification = async(req, res) => {
+  try {
+    const {otp} = req.body
+
+    //check if the field is filled
+    if(!otp){
+      return res.status(400).json({message: "Otp is required"})
+    }
+
+    //find the user otp
+    const user = await User.findOne({otp})
+    if(!user){
+      return res.status(400).json({message: "invalid OTP"})
+    }
+
+    //check if otp is expired
+    if(user.otpExpires < Date.now()){
+      return res.status(400).json({message: "OTP has expired"})
+    }
+
+    //clear the otp after a successful verification
+    // Clear OTP and expiration on successful verification
+    await User.updateOne({ _id: user._id }, { otp: undefined, otpExpires: undefined });
+
+    res.status(200).json({message: "OTP verified successfully"})
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message: "Internal server error"})
+  }
+}
 
 //reset password
+export const resetPassword = async(req, res) => {
+  try {
+    const {newPassword, confirmPassword} = req.body
+
+    //check if fields are provided
+    if(!newPassword || !confirmPassword){
+      return res.status(400).json({message: "newPassword and confirmPassword are required"})
+    }
+
+    //check if new password and confirm password match
+    if(newPassword !== confirmPassword){
+      return res.sttaus(400).json({message: "Passwords do not match"})
+    }
+  
+      //hash password
+    const saltRounds = process.env.SALT_ROUNDS
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
+
+    const user = await User.findOneAndUpdate(
+      { _id: req.user.id }, 
+      { password: hashedPassword },
+      { new: true } 
+    );
+
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Password reset successful' });
+
+  } catch (error) {
+    console.log(error )
+    res.status(500).json({message: "Internal server error"})
+  }
+}
