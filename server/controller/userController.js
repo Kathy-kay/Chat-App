@@ -6,7 +6,7 @@ import emailVerification from "../utils/emailSender";
 
 
 
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
 
   try {
     const {email, password, confirmPassword} = req.body
@@ -33,7 +33,6 @@ const signup = async (req, res) => {
   const newUser = await User.create({
     email, 
     password: hashedPassword,
-    isVerified: false
   })
   return res.status(201).json({message: "User created successfully"})
   
