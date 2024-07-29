@@ -33,8 +33,6 @@ const signup = async (req, res) => {
   const newUser = await User.create({
     email, 
     password: hashedPassword,
-    verificationToken,
-    verificationTokenExpires,
     isVerified: false
   })
   return res.status(201).json({message: "User created successfully"})
@@ -111,7 +109,7 @@ export const emailVerify = async(req, res) =>{
     const otpExpires = Date.now() + 1 * 60 * 1000
 
      // Update user with OTP and expiration
-    await user.updateOne({ otp, otpExpires });
+    await user.updateOne({ otp, otpExpires});
 
     //send verification email
     await emailVerification(email, otp)
@@ -174,7 +172,7 @@ export const resetPassword = async(req, res) => {
     const saltRounds = process.env.SALT_ROUNDS
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
 
-    const user = await User.findOneAndUpdate(
+    const user = await User.findOneAndUpdate(  
       { _id: req.user.id }, 
       { password: hashedPassword },
       { new: true } 
