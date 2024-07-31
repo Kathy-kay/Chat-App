@@ -188,3 +188,24 @@ export const resetPassword = async(req, res) => {
     res.status(500).json({message: "Internal server error"})
   }
 }
+
+//userinfo
+export const getUserInfo = async(req, res) =>{
+  try {
+    const userId = req.user.id
+    //fetch user info excluding the password field
+    const user = await User.findById(userId).select('-password')
+
+    //check if user is was found
+    if(!user){
+      return res.status(400).json({message: "User not found"})
+    }
+    
+    //return user info
+    res.status(200).json(user)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message: "Internal Server Error"})
+  }
+}
+
