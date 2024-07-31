@@ -192,7 +192,7 @@ export const resetPassword = async(req, res) => {
 //userinfo
 export const getUserInfo = async(req, res) =>{
   try {
-    const userId = req.user.id
+    const {userId} = req.user.id
     //fetch user info excluding the password field
     const user = await User.findById(userId).select('-password')
 
@@ -200,7 +200,7 @@ export const getUserInfo = async(req, res) =>{
     if(!user){
       return res.status(400).json({message: "User not found"})
     }
-    
+
     //return user info
     res.status(200).json(user)
   } catch (error) {
@@ -209,3 +209,52 @@ export const getUserInfo = async(req, res) =>{
   }
 }
 
+//updateuserinfo
+
+export const updateUserProfile = async(req, res) => {
+  try {
+    const {userId} = req.user.id //get userid from the token middleware
+    const {firstName, lastName, color} = req.body //fields that can be updated
+
+    if(!firstName){
+      res.status(400).json({message: "firstName is required"})
+    }
+
+    const updatedField = {
+      firstName,
+      lastName,
+      profileImage,
+      color
+    }
+    
+    const updatedObject = Object.fromEntries(Object.entries(updatedField).filter(([key, value]) => value !== undefined))
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...updatedObject,
+        profileSetup: true,
+      },
+      {new: true, runValidators: true}
+    ).select('-password')
+
+    res.json(
+      {
+          status: 200,
+          message: "User profile Update successfully",
+          data: {
+            id:updatedUser.id,
+            email: updatedUser.email,
+            profileSetup: updatedUser.profileSetup,
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
+            color: updatedUser.color,
+            profileImage: updatedUser.profleImage
+
+          },
+      }
+    )
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({message: "Internal server error"})
+  }
+}

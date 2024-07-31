@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema(
       default: "active"
 
     },
-    image: {
+    profleImage: {
       type:String,
       required:false
     },
