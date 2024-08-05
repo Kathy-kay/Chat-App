@@ -6,7 +6,7 @@ const SignupForm = () => {
   const {register, handleSubmit, formState: {errors}} = useForm()
   return (
     <div className="flex items-center justify-center flex-col">
-      <div className="flex flex-col md:justify-center   gap-7 h-full w-full">
+      <div className="flex flex-col md:justify-center gap-7 h-full w-full">
         <div className="flex flex-col items-center justify-center">
           <div className="flex items-center justify-center">
             <h1 className="font-bold text-5xl md:text-6xl">Welcome</h1>
