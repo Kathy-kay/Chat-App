@@ -20,9 +20,9 @@ const Auth = () => {
     <div className="h-screen flex w-screen items-center justify-center">
       <div
         className=" bg-white border-2 border-white 
-      text-opacity-90 w-[80vw] rounded-3xl shadow-2xl md:w-[90vw] xl:w-[60vw] lg:w-[70vw] pb-10"
+      text-opacity-90 w-[80vw] rounded-3xl shadow-2xl md:w-[90vw] xl:w-[60vw] sm:px-20 lg:w-[70vw] py-10"
       >
-        <div className="flex flex-col items-center justify-center gap-10 h-full">
+        <div className="flex flex-col md:items-center md:justify-center gap-10 h-full w-full">
           <div className="flex flex-col items-center justify-center">
             <div className="flex items-center justify-center">
               <h1 className="font-bold text-5xl md:text-6xl">Welcome</h1>
@@ -32,7 +32,7 @@ const Auth = () => {
               Fill in the details to get started with the chat app
             </p>
           </div>
-          <div className="flex items-center justify-center w-full">
+          <div className="flex items-center justify-center w-full ">
             <Tabs defaultValue="login" className="w-3/4">
               <TabsList className="bg-transparent rounded-none w-full">
                 <TabsTrigger

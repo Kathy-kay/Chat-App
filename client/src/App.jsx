@@ -1,7 +1,7 @@
 import { Routes,Route } from "react-router-dom"
-import Auth from "./pages/auth"
-import Profile from "./pages/profile"
-import Chat from "./pages/chat"
+import Auth from "./_auth"
+import Profile from "./root/pages/Profile"
+import Chat from "./root/pages/chat"
 
 
 
