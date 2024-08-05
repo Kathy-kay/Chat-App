@@ -38,7 +38,7 @@ const SigninForm = () => {
             }`}
           />
           {errors.email && (
-            <p className="text-red-500 mt-5">{errors.email.message}</p>
+            <p className="text-red-500">{errors.email.message}</p>
           )}
           <input
             {...register("password", {
@@ -55,24 +55,24 @@ const SigninForm = () => {
             }`}
           />
           {errors.password && (
-            <p className="text-red-500 mt-5">{errors.password.message}</p>
+            <p className="text-red-500">{errors.password.message}</p>
           )}
 
           <Button className="rounded-2xl p-6 bg-[#180161]/70 border-none hover:bg-[#180161]">
             Signup
           </Button>
 
-          <div className="flex justify-between items-center mt-5">
+          <div className="flex justify-between items-center ">
             <Link
-              to="/forgot-password/email-verify"
+              to="/forgotpassword/email-verify"
               className="text-[#180161] text-sm font-semibold"
             >
               Forgot Password?
             </Link>
             <p className="text-[14px] font-semibold leading-[140%] text-center">
-              Don't have an account?
+            Don&apos;t have an account?
               <Link
-                to="/signup"
+                to="/sign-up"
                 className="text-[#180161] text-sm font-bold ml-1"
               >
                 Sign up

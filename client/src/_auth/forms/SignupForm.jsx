@@ -29,7 +29,7 @@ const SignupForm = () => {
           type="email"
           className={`rounded-2xl p-6  border-2 ${errors.email ? "border-red-500" : "border-[#180161]"}`}
           />
-          {errors.email && <p className="text-red-500 mt-5">{errors.email.message}</p>}
+          {errors.email && <p className="text-red-500 ">{errors.email.message}</p>}
           <input 
           {...register("password", {
             required: "Password is required",
@@ -42,7 +42,7 @@ const SignupForm = () => {
           type="password"
           className={`rounded-2xl p-6 outline-none  border-2 ${errors.email ? "border-red-500" : "border-[#180161]"}`}
           />
-           {errors.password && <p className="text-red-500 mt-5">{errors.password.message}</p>}
+           {errors.password && <p className="text-red-500 ">{errors.password.message}</p>}
 
            <Button className="rounded-2xl p-6 bg-[#180161]/70 border-none hover:bg-[#180161]">Signup</Button>
 
