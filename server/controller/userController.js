@@ -2,6 +2,7 @@ import User from "../models/userModels";
 import bcrypt from "bcrypt"
 import generate from "otp-generator"
 import jwt from "jsonwebtoken"
+import validator from "validator"
 import emailVerification from "../utils/emailSender";
 
 
@@ -15,14 +16,19 @@ export const signup = async (req, res) => {
   if(!email || !password || !confirmPassword){
     return res.status(400).json({message: "All fields are required"})
   }
-
+  if(!validator.isEmail(email)){
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+  if (password.length < 8) {
+    return res.status(400).json({ message: "Password must be at least 8 characters long" });
+  }
   if(password !== confirmPassword){
     return res.status(400).json({message: "Password and confirm Password do not match"})
   }
   //check if email already exist
   const userExist = await User.findOne({email})
   if(userExist){
-    return res.status(400).json({message: "User with given emial already exist"})
+    return res.status(400).json({message: "User with given email already exist"})
   }
 
   //hash password
@@ -34,7 +40,10 @@ export const signup = async (req, res) => {
     email, 
     password: hashedPassword,
   })
-  return res.status(201).json({message: "User created successfully"})
+  return res.status(201).json({
+    message: "User created successfully",
+    user: { id: newUser._id, email: newUser.email },
+  })
   
   } catch (error) {
     console.log(error)
@@ -56,7 +65,7 @@ export const login = async(req, res) =>{
   const user = await User.findOne({email})
 
   //check if user exist and compare the password with the hashed password
-  if(user && (await bcrypt.compare(password, user.hashedPassword))){
+  if(user && (await bcrypt.compare(password, user.password))){
     const accessToken = jwt.sign({
       user: {
         email: user.email,
@@ -66,23 +75,64 @@ export const login = async(req, res) =>{
     {expiresIn: "1h"}
     )
   //set token in cookies
-    res.cookie(
-      "token", accessToken,
-      {
-        httpOnly: true,
-        secure:process.env.NODE_ENV === production
-      }
-    )
-    return res.status(200).json({message: "Login successful", token: accessToken})
+  res.cookie("token", accessToken, {
+    httpOnly: true, // Secure the token against client-side scripts
+    secure: false, 
+    sameSite: "None", // Allow cross-origin requests if needed
+    path: "/", // Accessible across the domain
+    maxAge: 60 * 60 * 1000, // 1 hour
+  });
+
+  const refreshToken = jwt.sign({
+    user: {
+      id: user.id
+    }
+  }, process.env.REFRESH_TOKEN_SECRET,
+  {expiresIn: "7d"}
+  )
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "None",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+    return res.status(200).json({message: "Login successful"});
   }
   else{
     return res.status(400).json({message: "Invalid email or password"})
   }
  } catch (error) {
   console.log(error)
+  return res.status(500).json({ message: "Internal server error" });
  }
 }
+export const RefreshToken = async(req, res) =>{
+  try {
+    const {refreshToken} = req.cookies;
+    if (!refreshToken) {
+      return res.status(401).json({ message: "No refresh token provided" });
+    }
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ message: "Invalid refresh token" });
+      }
 
+      const accessToken = jwt.sign(
+        { user: { id: decoded.user.id, email: decoded.user.email } },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1h" }
+      );
+      return res.status(200).json({
+        accessToken
+      })
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
 //email verification
 export const emailVerify = async(req, res) =>{
   try {
@@ -159,7 +209,7 @@ export const resetPassword = async(req, res) => {
 
     //check if fields are provided
     if(!newPassword || !confirmPassword){
-      return res.status(400).json({message: "newPassword and confirmPassword are required"})
+      return res.status(400).json({message: "new password and confirm password are required"})
     }
 
     //check if new password and confirm password match

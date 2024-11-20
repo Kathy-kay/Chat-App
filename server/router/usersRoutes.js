@@ -9,8 +9,8 @@ router.post("login", login)
 router.post("forgot-password/email-verify", emailVerify)
 router.post("/forgot-password/otp-verify", otpVerification)
 router.post("/reset-password", resetPassword)
-router.get("/user", validateToken, getUserInfo)
-router.post("/user/update", validateToken, updateUserProfile)
+router.get("/users", validateToken, getUserInfo)
+router.post("/users/update", validateToken, updateUserProfile)
 
 
 export default router
